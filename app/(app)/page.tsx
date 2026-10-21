@@ -39,8 +39,8 @@ function AttentionItem({ r }: { r: AssignmentView }) {
             {r.tanggalSelesai && <> · selesai {formatDate(r.tanggalSelesai)}</>}
           </p>
         </div>
-        <div className="flex items-center gap-1.5">
-          <StatusBadge status={r.status} daysLeft={r.daysLeft} estimatedEnd={r.estimatedEnd} estimateExpired={r.estimateExpired} />
+        <div className="flex max-w-[15rem] flex-wrap items-center gap-1.5 sm:justify-end">
+          <StatusBadge status={r.status} daysLeft={r.daysLeft} estimatedEnd={r.estimatedEnd} estimateExpired={r.estimateExpired} renewal={r.renewal} />
           {r.startMissing && <StartMissingBadge />}
         </div>
       </Link>
@@ -73,6 +73,8 @@ export default async function DashboardPage() {
   const count = (s: StatusKey) => views.filter((v) => v.status === s).length;
   const soon = views.filter((v) => v.status === 'segera').sort((a, b) => a.daysLeft! - b.daysLeft!);
   const unknown = views.filter((v) => v.status === 'belum');
+  const expired = unknown.filter((v) => v.estimateExpired);
+  const renewCount = (k: 'sama' | 'lain' | 'tidak') => expired.filter((v) => v.renewal?.kind === k).length;
 
   const summary = [
     { label: 'Tutor unik', value: groupTutors(views).length, href: '/tutor' },
@@ -116,6 +118,12 @@ export default async function DashboardPage() {
             <h3 className="border-b border-border px-4 py-2.5 text-sm font-semibold">
               Masa tugas belum diketahui <span className="font-normal text-muted">({unknown.length})</span>
             </h3>
+            {expired.length > 0 && (
+              <p className="border-b border-border bg-surface-2 px-4 py-2 text-xs text-muted">
+                {expired.length} perkiraannya sudah lewat: {renewCount('sama')} ada SK baru di prodi yang sama,{' '}
+                {renewCount('lain')} bertugas di prodi lain, <strong className="text-orange-700">{renewCount('tidak')} tanpa SK baru (perlu verifikasi)</strong>.
+              </p>
+            )}
             {unknown.length ? (
               <ul className="max-h-96 divide-y divide-border overflow-y-auto">{unknown.map((r) => <AttentionItem key={r.id} r={r} />)}</ul>
             ) : (
