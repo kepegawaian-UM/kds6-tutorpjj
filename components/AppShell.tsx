@@ -57,7 +57,7 @@ export function AppShell({ children, todayLabel }: { children: React.ReactNode; 
             {g.items.map((i) => {
               const active = i.match?.(pathname) ?? false;
               const cls = `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                active ? 'bg-white/10 font-medium text-gold' : 'text-cream/85 hover:bg-white/5 hover:text-white'
+                active ? 'bg-white/10 font-medium text-white' : 'text-cream/80 hover:bg-white/5 hover:text-white'
               }`;
               return i.download ? (
                 <a key={i.href} href={i.href} className={cls}>{i.icon}{i.label}</a>
@@ -70,7 +70,7 @@ export function AppShell({ children, todayLabel }: { children: React.ReactNode; 
       </nav>
       <div className="border-t border-white/10 p-4">
         <div className="flex items-center gap-3">
-          <span className="grid size-9 place-items-center rounded-full bg-gold/90 text-sm font-semibold text-[#183630]">A</span>
+          <span className="grid size-9 place-items-center rounded-full bg-white/15 text-sm font-semibold text-white">A</span>
           <div className="min-w-0 flex-1 leading-tight">
             <p className="truncate text-sm font-medium text-white">Admin</p>
             <p className="truncate text-xs text-cream/60">Administrator tunggal</p>
@@ -95,7 +95,7 @@ export function AppShell({ children, todayLabel }: { children: React.ReactNode; 
       )}
 
       <div className="lg:pl-60">
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-surface/95 px-4 py-3 backdrop-blur">
+        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-white/95 px-4 py-3 backdrop-blur sm:px-8">
           <button className="btn !min-h-9 !px-2.5 lg:hidden" onClick={() => setOpen(true)} aria-label="Buka menu">
             <IconMenu />
           </button>
@@ -116,9 +116,10 @@ export function AppShell({ children, todayLabel }: { children: React.ReactNode; 
               onChange={(e) => setQ(e.target.value)}
             />
           </form>
-          <span className="ml-auto hidden items-center gap-2 rounded-full bg-accent-soft px-3 py-1.5 text-xs font-medium sm:inline-flex">
+          <span className="ml-auto hidden whitespace-nowrap items-center gap-2 rounded-full bg-accent-soft px-3 py-1.5 text-xs font-medium sm:inline-flex">
             <IconCalendar /> Posisi: {todayLabel}
           </span>
+          <span className="ml-auto grid size-9 shrink-0 place-items-center rounded-full bg-accent text-sm font-semibold text-accent-fg sm:ml-0" aria-hidden="true">A</span>
         </header>
         <main className="mx-auto max-w-6xl px-4 py-6 sm:px-8 sm:py-8">{children}</main>
       </div>
