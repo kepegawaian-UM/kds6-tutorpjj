@@ -69,7 +69,7 @@ export default async function TutorDetailPage({ params }: { params: Promise<{ ke
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <p className="font-medium">{shortProdi(r.prodi)}</p>
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <StatusBadge status={v.status} daysLeft={v.daysLeft} estimatedEnd={v.estimatedEnd} estimateExpired={v.estimateExpired} />
+                  <StatusBadge status={v.status} daysLeft={v.daysLeft} />
                 </div>
               </div>
               <dl className="mt-3 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-[auto_1fr]">
@@ -77,7 +77,7 @@ export default async function TutorDetailPage({ params }: { params: Promise<{ ke
                 <dd className="break-all">{r.noSk}{r.tanggalSk && <span className="text-muted"> · tgl {formatDate(r.tanggalSk)}</span>}</dd>
                 <dt className="text-muted">Periode</dt>
                 <dd className="tabular-nums">
-                  {r.tanggalMulai ? formatDate(r.tanggalMulai) : '?'} – {r.tanggalSelesai ? formatDate(r.tanggalSelesai) : '?'}
+                  {r.tanggalMulai ? formatDate(r.tanggalMulai) : '?'} – {v.endDate ? formatDate(v.endDate) : '?'}
                 </dd>
               </dl>
               <Link href={`/penugasan/${r.id}`} className="link-text mt-3 inline-block">Ubah</Link>

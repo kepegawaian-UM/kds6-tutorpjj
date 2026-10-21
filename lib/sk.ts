@@ -31,7 +31,7 @@ export function summarizeSk(views: AssignmentView[]): SkSummary[] {
     const status: Record<StatusKey, number> = { aktif: 0, segera: 0, berakhir: 0, belum: 0 };
     rows.forEach((r) => status[r.status]++);
     const mulai = rows.map((r) => r.tanggalMulai).filter((d): d is string => !!d).sort();
-    const selesai = rows.map((r) => r.tanggalSelesai).filter((d): d is string => !!d).sort();
+    const selesai = rows.map((r) => r.endDate).filter((d): d is string => !!d).sort();
     out.push({
       noSk,
       tanggalSk: first(rows.map((r) => r.tanggalSk)),
@@ -49,6 +49,3 @@ export function summarizeSk(views: AssignmentView[]): SkSummary[] {
     (a, b) => (b.tanggalSk ?? '').localeCompare(a.tanggalSk ?? '') || b.noSk.localeCompare(a.noSk, 'id', { numeric: true }),
   );
 }
-
-/** SK yang perlu perhatian: ada penugasan segera berakhir atau masa tugas belum diketahui. */
-export const needsAttention = (s: SkSummary) => s.status.segera > 0 || s.status.belum > 0;

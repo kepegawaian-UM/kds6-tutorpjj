@@ -49,7 +49,7 @@ describe('filter', () => {
     expect(applyFilters(views, parseFilters({ q: 'arbayah spd mpd' }))).toHaveLength(1);
   });
   it('memfilter status dan prodi', () => {
-    expect(applyFilters(views, parseFilters({ status: 'belum' }))).toHaveLength(1);
+    expect(applyFilters(views, parseFilters({ status: 'berakhir' }))).toHaveLength(1); // selesai kosong -> perkiraan 30/06/2026
     expect(applyFilters(views, parseFilters({ prodi: 'S2 PJJ Pendidikan Dasar' }))).toHaveLength(1);
   });
 });

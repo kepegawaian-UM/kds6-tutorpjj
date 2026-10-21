@@ -42,6 +42,6 @@ describe('rows', () => {
     expect(out[0]).toBe(3);
     expect(out[10]).toBe(46076);
     expect(out[12]).toBe('');
-    expect(out).toHaveLength(15);
+    expect(out).toHaveLength(16); // A..O + P (perkiraan)
   });
 });

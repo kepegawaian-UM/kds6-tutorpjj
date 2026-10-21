@@ -1,8 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { google, type sheets_v4 } from 'googleapis';
+import { PERKIRAAN_HEADER } from './config';
 import { AppError, friendlyGoogleError } from './errors';
 import { demoCreate, demoDelete, demoList, demoUpdate, isDemo } from './demo';
 import { COL, assignmentToRow, rowToAssignment } from './rows';
+import { estimateEnd } from './semester';
 import type { Assignment, AssignmentInput } from './types';
 
 /** Seluruh akses Google Sheets ada di sini (hanya dijalankan di server). */
@@ -93,6 +95,7 @@ export async function formatRows(startRow: number, endRow: number = startRow) {
         cell(COL.tanggalSk, { type: 'DATE', pattern: 'dd/mm/yyyy' }),
         cell(COL.tanggalMulai, { type: 'DATE', pattern: 'dd/mm/yyyy' }),
         cell(COL.tanggalSelesai, { type: 'DATE', pattern: 'dd/mm/yyyy' }),
+        cell(COL.selesaiPerkiraan, { type: 'DATE', pattern: 'dd/mm/yyyy' }),
       ],
     },
   });
@@ -113,7 +116,7 @@ export function listAssignments(): Promise<Assignment[]> {
     const [main, nips] = await Promise.all([
       sheets.spreadsheets.values.get({
         spreadsheetId: env.sheetId,
-        range: `${tab}!A1:O`,
+        range: `${tab}!A1:P`,
         valueRenderOption: 'UNFORMATTED_VALUE',
         dateTimeRenderOption: 'SERIAL_NUMBER',
       }),
@@ -146,6 +149,9 @@ export function listAssignments(): Promise<Assignment[]> {
     if (values.length && String(values[0]?.[COL.id] ?? '').trim() !== 'ID') {
       fixes.push({ range: `${tab}!O1`, values: [['ID']] });
     }
+    if (values.length && String(values[0]?.[COL.selesaiPerkiraan] ?? '').trim() !== PERKIRAAN_HEADER) {
+      fixes.push({ range: `${tab}!P1`, values: [[PERKIRAAN_HEADER]] });
+    }
     if (fixes.length) {
       await sheets.spreadsheets.values.batchUpdate({
         spreadsheetId: env.sheetId,
@@ -154,6 +160,11 @@ export function listAssignments(): Promise<Assignment[]> {
     }
     return out;
   });
+}
+
+/** Perkiraan akhir semester untuk kolom P; kosong bila Tanggal Selesai terisi atau tak ada dasar tanggal. */
+export function perkiraanFor(input: Pick<AssignmentInput, 'tanggalMulai' | 'tanggalSk' | 'tanggalSelesai'>): string | null {
+  return estimateEnd(input);
 }
 
 /** Nomor baris (1-based) untuk sebuah ID, dicari ulang dari sheet agar aman terhadap sortir/sisip. */
@@ -191,7 +202,7 @@ export function createAssignment(input: AssignmentInput): Promise<Assignment> {
       if (String(r?.[0] ?? '').trim() === input.noSk) maxNo = Math.max(maxNo, Number(nos[i]?.[0]) || 0);
     });
 
-    const a: Assignment = { id: randomUUID(), ...input };
+    const a: Assignment = { id: randomUUID(), ...input, selesaiPerkiraan: perkiraanFor(input) };
     const res = await sheets.spreadsheets.values.append({
       spreadsheetId: env.sheetId,
       range: `${tab}!A1`,
@@ -210,7 +221,7 @@ export function updateAssignment(id: string, input: AssignmentInput): Promise<As
   return wrap(async () => {
     const { sheets, env } = getSheets();
     const row = await findRowById(id);
-    const a: Assignment = { id, ...input };
+    const a: Assignment = { id, ...input, selesaiPerkiraan: perkiraanFor(input) };
     // Kolom NO (A) dan ID (O) tidak diubah.
     const values = assignmentToRow(a).slice(COL.nip, COL.tanggalSelesai + 1);
     await sheets.spreadsheets.values.update({
@@ -218,6 +229,13 @@ export function updateAssignment(id: string, input: AssignmentInput): Promise<As
       range: `${quoteTab(env.tab)}!B${row}:N${row}`,
       valueInputOption: 'RAW',
       requestBody: { values: [values] },
+    });
+    // Kolom P (perkiraan) dihitung ulang dari data terbaru.
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: env.sheetId,
+      range: `${quoteTab(env.tab)}!P${row}`,
+      valueInputOption: 'RAW',
+      requestBody: { values: [[assignmentToRow(a)[COL.selesaiPerkiraan]]] },
     });
     await formatRows(row);
     return a;

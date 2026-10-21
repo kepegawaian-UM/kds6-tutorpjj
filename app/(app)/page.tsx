@@ -36,7 +36,7 @@ function AttentionItem({ r }: { r: AssignmentView }) {
           <p className="truncate text-xs text-muted">{shortProdi(r.prodi)}</p>
         </div>
         <div className="shrink-0">
-          <StatusBadge status={r.status} daysLeft={r.daysLeft} estimatedEnd={r.estimatedEnd} estimateExpired={r.estimateExpired} />
+          <StatusBadge status={r.status} daysLeft={r.daysLeft} />
         </div>
       </Link>
     </li>
@@ -67,8 +67,8 @@ export default async function DashboardPage() {
 
   const count = (s: StatusKey) => views.filter((v) => v.status === s).length;
   const soon = views.filter((v) => v.status === 'segera').sort((a, b) => a.daysLeft! - b.daysLeft!);
-  // Perlu dilengkapi: tanpa tanggal selesai dan perkiraannya sudah lewat (atau tidak bisa diperkirakan).
-  const incomplete = views.filter((v) => v.status === 'belum' && (v.estimateExpired || !v.estimatedEnd));
+  // Perlu dilengkapi: tanggal selesai kosong dan tidak ada dasar untuk memperkirakan (mulai dan tanggal SK kosong).
+  const incomplete = views.filter((v) => v.status === 'belum');
 
   const summary = [
     { label: 'Tutor unik', value: groupTutors(views).length, href: '/tutor' },
@@ -87,7 +87,7 @@ export default async function DashboardPage() {
             <p className="mt-1 text-2xl font-semibold tabular-nums">{s.value}</p>
           </Link>
         ))}
-        {CARD_STATUS.map(({ key, tone }) => (
+        {CARD_STATUS.filter(({ key }) => key !== 'belum' || count('belum') > 0).map(({ key, tone }) => (
           <Link key={key} href={`/penugasan?status=${key}`} className="card p-4 hover:border-accent">
             <p className="text-xs text-muted">{STATUS_LABEL[key]}</p>
             <p className={`mt-1 text-2xl font-semibold tabular-nums ${tone}`}>{count(key)}</p>

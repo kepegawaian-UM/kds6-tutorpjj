@@ -76,6 +76,10 @@ describe('sheets', () => {
     const u = calls.find((c) => c.type === 'values.update')!.req;
     expect(u.range).toBe("'Penugasan'!B4:N4");
     expect(u.requestBody.values[0]).toHaveLength(13);
+    // Kolom P (perkiraan) dihitung ulang: mulai kosong + SK kosong => kosong; dengan mulai => akhir semester.
+    const p = calls.filter((c) => c.type === 'values.update').map((c) => c.req).find((r) => /!P4$/.test(r.range));
+    expect(p).toBeTruthy();
+    expect(p.requestBody.values[0][0]).toBe('');
   });
 
   it('hapus memakai deleteDimension pada baris yang benar', async () => {

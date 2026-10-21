@@ -15,6 +15,7 @@ import { HEADERS, SHEET_HEADERS } from '../lib/config';
 import { AppError, friendlyGoogleError } from '../lib/errors';
 import { COL, assignmentToRow, rowToAssignment } from '../lib/rows';
 import { formatRows, getEnv, getSheets, getTabId, quoteTab } from '../lib/sheets';
+import { estimateEnd } from '../lib/semester';
 import { areNamesSimilar, assignKeys, cleanNip, groupTutors, nameKey } from '../lib/tutors';
 import type { Assignment } from '../lib/types';
 
@@ -67,6 +68,7 @@ async function readWorkbook(file: string): Promise<Parsed> {
     const a = rowToAssignment(raw);
     a.id = randomUUID();
     a.nip = cleanNip(a.nip);
+    a.selesaiPerkiraan = estimateEnd(a);
     for (const k of ['nama', 'jabatanRutin', 'jabatanTugas', 'prodi', 'jenisPegawai', 'unitKerja', 'noSk', 'judulSk', 'pangkat'] as const) {
       a[k] = tidy(a[k]);
     }
@@ -155,7 +157,7 @@ async function main() {
   const { sheets, env } = getSheets();
   const tab = quoteTab(env.tab);
 
-  const existing = await sheets.spreadsheets.values.get({ spreadsheetId: env.sheetId, range: `${tab}!A1:O` });
+  const existing = await sheets.spreadsheets.values.get({ spreadsheetId: env.sheetId, range: `${tab}!A1:P` });
   const hasData = (existing.data.values ?? []).slice(1).some((r) => r.some((c) => String(c ?? '').trim() !== ''));
   if (hasData && !FORCE) {
     throw new AppError(
@@ -163,7 +165,7 @@ async function main() {
     );
   }
   if (hasData || (existing.data.values ?? []).length) {
-    await sheets.spreadsheets.values.clear({ spreadsheetId: env.sheetId, range: `${tab}!A1:O` });
+    await sheets.spreadsheets.values.clear({ spreadsheetId: env.sheetId, range: `${tab}!A1:P` });
   }
 
   const values = [SHEET_HEADERS, ...rows.map((a, i) => assignmentToRow(a, nos[i] === '' ? i + 1 : nos[i]))];

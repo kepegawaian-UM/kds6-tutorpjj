@@ -21,7 +21,7 @@ function Period({ r }: { r: AssignmentView }) {
     <span className="tabular-nums">
       {r.tanggalMulai ? formatDate(r.tanggalMulai) : <span className="text-muted">?</span>}
       {' – '}
-      {r.tanggalSelesai ? formatDate(r.tanggalSelesai) : <span className="text-muted">?</span>}
+      {r.endDate ? formatDate(r.endDate) : <span className="text-muted">?</span>}
     </span>
   );
 }
@@ -29,7 +29,7 @@ function Period({ r }: { r: AssignmentView }) {
 function Badges({ r }: { r: AssignmentView }) {
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      <StatusBadge status={r.status} daysLeft={r.daysLeft} estimatedEnd={r.estimatedEnd} estimateExpired={r.estimateExpired} />
+      <StatusBadge status={r.status} daysLeft={r.daysLeft} />
     </div>
   );
 }

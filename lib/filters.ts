@@ -54,7 +54,7 @@ const SORTERS: Record<string, (a: AssignmentView, b: AssignmentView) => number> 
   jenis: (a, b) => a.jenisPegawai.localeCompare(b.jenisPegawai, 'id'),
   sk: (a, b) => a.noSk.localeCompare(b.noSk, 'id', { numeric: true }),
   mulai: (a, b) => (a.tanggalMulai ?? '').localeCompare(b.tanggalMulai ?? ''),
-  selesai: (a, b) => (a.tanggalSelesai ?? '9999').localeCompare(b.tanggalSelesai ?? '9999'),
+  selesai: (a, b) => (a.endDate ?? '9999').localeCompare(b.endDate ?? '9999'),
   status: (a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status] || (a.daysLeft ?? 0) - (b.daysLeft ?? 0),
 };
 

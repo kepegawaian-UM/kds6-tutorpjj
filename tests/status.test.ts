@@ -14,8 +14,11 @@ describe('getStatus', () => {
     expect(getStatus(mk(today), today)).toMatchObject({ status: 'segera', daysLeft: 0 });
   });
   it('berakhir bila sudah lewat', () => expect(getStatus(mk('2026-10-20'), today).status).toBe('berakhir'));
-  it('selesai kosong = belum diketahui', () => {
-    expect(getStatus(mk(null), today)).toMatchObject({ status: 'belum', daysLeft: null });
+  it('selesai kosong: dihitung dari perkiraan akhir semester, bukan "belum"', () => {
+    expect(getStatus(mk(null), today)).toMatchObject({ status: 'berakhir', endDate: '2026-06-30', endIsEstimate: true });
+  });
+  it('selesai kosong tanpa mulai dan tanggal SK = belum diisi', () => {
+    expect(getStatus({ tanggalMulai: null, tanggalSk: null, tanggalSelesai: null }, today)).toMatchObject({ status: 'belum', daysLeft: null });
   });
   it('menandai tanggal mulai kosong secara terpisah', () => {
     expect(getStatus(mk('2026-12-31', null), today)).toMatchObject({ status: 'aktif', startMissing: true });
@@ -39,37 +42,5 @@ describe('tanggal', () => {
   });
   it('hari ini memakai zona Asia/Jakarta', () => {
     expect(todayJakarta(new Date('2026-10-20T18:00:00Z'))).toBe('2026-10-21');
-  });
-});
-
-describe('petunjuk perpanjangan', () => {
-  const mk = (p: Partial<import('@/lib/types').Assignment>): import('@/lib/types').Assignment => ({
-    id: Math.random().toString(36), nip: '', nama: 'Wariadi, M.Pd', pangkat: '', jabatanRutin: '', jabatanTugas: '',
-    prodi: 'S2 PJJ Pendidikan Nonformal', jenisPegawai: 'Guru Luar UM', unitKerja: '', noSk: 'SK/OLD', tanggalSk: '2026-02-09',
-    judulSk: '', tanggalMulai: '2026-02-09', tanggalSelesai: null, ...p,
-  });
-  const today = '2026-10-21';
-
-  it('sama: ada SK lebih baru di prodi yang sama', async () => {
-    const { toViews } = await import('@/lib/view');
-    const v = toViews([mk({}), mk({ noSk: 'SK/NEW', tanggalSk: '2026-08-21', tanggalMulai: '2026-08-21' })], today);
-    expect(v[0].renewal).toMatchObject({ kind: 'sama', noSk: 'SK/NEW' });
-  });
-  it('lain: SK lebih baru hanya di prodi lain', async () => {
-    const { toViews } = await import('@/lib/view');
-    const v = toViews([mk({}), mk({ noSk: 'SK/MTK', prodi: 'S2 PJJ Pendidikan Matematika', tanggalSk: '2026-05-11', tanggalMulai: '2026-05-11', tanggalSelesai: '2026-12-31' })], today);
-    expect(v[0].renewal).toMatchObject({ kind: 'lain', noSk: 'SK/MTK', prodi: 'S2 PJJ Pendidikan Matematika' });
-    expect(v[1].renewal).toBeNull();
-  });
-  it('tidak: tidak ada SK lebih baru; SK lama tidak dihitung', async () => {
-    const { toViews } = await import('@/lib/view');
-    const v = toViews([mk({ noSk: 'SK/B', tanggalSk: '2026-05-11' }), mk({ noSk: 'SK/A', tanggalSk: '2026-02-09' })], today);
-    expect(v[0].renewal).toEqual({ kind: 'tidak' });
-  });
-  it('null bila perkiraan belum lewat atau tanggal selesai ada', async () => {
-    const { toViews } = await import('@/lib/view');
-    const v = toViews([mk({ tanggalMulai: '2026-08-21', tanggalSk: '2026-08-21' }), mk({ tanggalSelesai: '2026-12-31', noSk: 'X' })], today);
-    expect(v[0].renewal).toBeNull();
-    expect(v[1].renewal).toBeNull();
   });
 });

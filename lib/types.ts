@@ -16,23 +16,24 @@ export interface Assignment {
   judulSk: string;
   tanggalMulai: IsoDate;
   tanggalSelesai: IsoDate;
+  /** Kolom P di Sheet: perkiraan akhir semester, hanya terisi bila Tanggal Selesai kosong. */
+  selesaiPerkiraan?: IsoDate;
 }
 
-/** Input tanpa ID (untuk tambah/ubah). */
-export type AssignmentInput = Omit<Assignment, 'id'>;
+/** Input tanpa ID (untuk tambah/ubah). Perkiraan dihitung otomatis, bukan diisi pengguna. */
+export type AssignmentInput = Omit<Assignment, 'id' | 'selesaiPerkiraan'>;
 
 export type StatusKey = 'aktif' | 'segera' | 'berakhir' | 'belum';
 
 export interface StatusInfo {
   status: StatusKey;
-  /** Sisa hari sampai Tanggal Selesai (negatif bila sudah lewat); null bila tanggal selesai kosong. */
+  /** Sisa hari sampai akhir masa tugas (negatif bila sudah lewat); null bila tidak ada tanggal akhir sama sekali. */
   daysLeft: number | null;
   /** Penanda kualitas data terpisah. */
   startMissing: boolean;
-  /** Perkiraan akhir (akhir semester) hanya bila Tanggal Selesai kosong; tidak ditulis ke Sheets. */
-  estimatedEnd: string | null;
-  /** Perkiraan sudah lewat dari hari ini (perlu verifikasi). */
-  estimateExpired: boolean;
+  /** Tanggal akhir yang dipakai: Tanggal Selesai, atau perkiraan akhir semester bila kosong. */
+  endDate: string | null;
+  endIsEstimate: boolean;
 }
 
 export interface Tutor {

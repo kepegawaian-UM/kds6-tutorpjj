@@ -3,18 +3,22 @@ import { diffDays, todayJakarta } from './dates';
 import { estimateEnd } from './semester';
 import type { Assignment, StatusInfo } from './types';
 
-type DatesOnly = Pick<Assignment, 'tanggalMulai' | 'tanggalSelesai'> & Partial<Pick<Assignment, 'tanggalSk'>>;
+type DatesOnly = Pick<Assignment, 'tanggalMulai' | 'tanggalSelesai'> & Partial<Pick<Assignment, 'tanggalSk' | 'selesaiPerkiraan'>>;
 
+/**
+ * Status dari tanggal akhir efektif: Tanggal Selesai bila ada; jika kosong, perkiraan akhir semester
+ * (kolom P di Sheet, atau dihitung langsung bila kolom P kosong). "belum" hanya bila tidak ada dasar sama sekali.
+ */
 export function getStatus(a: DatesOnly, today: string = todayJakarta()): StatusInfo {
   const startMissing = !a.tanggalMulai;
-  const none = { estimatedEnd: null, estimateExpired: false };
-  if (!a.tanggalSelesai) {
-    // Kategori tetap terpisah dari Aktif/Berakhir; perkiraan hanya petunjuk.
-    const estimatedEnd = estimateEnd({ tanggalMulai: a.tanggalMulai, tanggalSk: a.tanggalSk ?? null, tanggalSelesai: null });
-    return { status: 'belum', daysLeft: null, startMissing, estimatedEnd, estimateExpired: !!estimatedEnd && estimatedEnd < today };
-  }
-  const daysLeft = diffDays(today, a.tanggalSelesai);
-  if (daysLeft < 0) return { status: 'berakhir', daysLeft, startMissing, ...none };
-  if (daysLeft <= EXPIRING_SOON_DAYS) return { status: 'segera', daysLeft, startMissing, ...none };
-  return { status: 'aktif', daysLeft, startMissing, ...none };
+  const estimate = a.tanggalSelesai
+    ? null
+    : a.selesaiPerkiraan ?? estimateEnd({ tanggalMulai: a.tanggalMulai, tanggalSk: a.tanggalSk ?? null, tanggalSelesai: null });
+  const endDate = a.tanggalSelesai ?? estimate;
+  const endIsEstimate = !a.tanggalSelesai && !!estimate;
+  if (!endDate) return { status: 'belum', daysLeft: null, startMissing, endDate: null, endIsEstimate: false };
+
+  const daysLeft = diffDays(today, endDate);
+  const status = daysLeft < 0 ? 'berakhir' : daysLeft <= EXPIRING_SOON_DAYS ? 'segera' : 'aktif';
+  return { status, daysLeft, startMissing, endDate, endIsEstimate };
 }

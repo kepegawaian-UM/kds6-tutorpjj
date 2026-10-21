@@ -93,11 +93,11 @@ tests/          unit test (vitest)
 | Aktif | Tanggal Selesai > 30 hari dari hari ini |
 | Segera berakhir | Sisa 0 sampai 30 hari (sisa hari ditampilkan) |
 | Berakhir | Tanggal Selesai sudah lewat |
-| Perkiraan masa tugas | Tanggal Selesai kosong. Badge kuning berisi perkiraan akhir semester, mis. "Perkiraan s.d. 31/12/2026" (tanpa dasar tanggal: "Tanggal selesai belum diisi"). Tidak dianggap aktif maupun berakhir |
+| Tanggal selesai belum diisi | Tanggal Selesai kosong dan tidak ada dasar untuk memperkirakan (hampir tidak pernah terjadi, lihat kolom P di bawah) |
 
 Penanda terpisah **"Tanggal mulai kosong"** muncul bila Tanggal Mulai kosong.
 
-**Perkiraan akhir semester**: bila Tanggal Selesai kosong, aplikasi menampilkan petunjuk "Perkiraan s.d. …" yaitu akhir semester pertama (30 Juni atau 31 Desember, `SEMESTER_ENDS` di [lib/config.ts](lib/config.ts)) yang jatuh pada atau setelah Tanggal Mulai (atau Tanggal SK bila mulai kosong). Status tetap "Masa tugas belum diketahui", perkiraan tidak ditulis ke Google Sheets, dan perkiraan yang sudah lewat hanya diberi tanda "verifikasi", tidak otomatis menjadi "Berakhir". Di form, tanggal selesai yang tidak jatuh di akhir semester mendapat peringatan lunak (tetap bisa disimpan).
+**Kolom P "Selesai (perkiraan)"**: bila Tanggal Selesai kosong, aplikasi menulis perkiraan akhir semester ke kolom P di Google Sheets (30 Juni atau 31 Desember, `SEMESTER_ENDS` di [lib/config.ts](lib/config.ts)), yaitu akhir semester pertama yang jatuh pada atau setelah Tanggal Mulai (atau Tanggal SK bila mulai kosong). Status dihitung dari Tanggal Selesai, atau dari kolom P bila Tanggal Selesai kosong, jadi di aplikasi tampil sebagai Aktif/Segera berakhir/Berakhir tanpa keterangan perkiraan. Kolom Tanggal Selesai asli tidak pernah diubah, dan ekspor Excel/CSV hanya memuat Tanggal Selesai asli (kolom A-N). Admin boleh menimpa kolom P langsung di Sheets. Kolom P dihitung ulang setiap kali penugasan diubah lewat aplikasi, dan bila Tanggal Selesai kemudian diisi, kolom P diabaikan. Untuk mengisi kolom P bagi data lama: `npm run backfill` (dry-run) lalu `npm run backfill -- --apply`. Status "Tanggal selesai belum diisi" hanya muncul bila Tanggal Mulai dan Tanggal SK juga kosong.
 
 **Tutor unik**: kunci utama NIP. Tanpa NIP, kunci dari nama yang dinormalkan (huruf kecil, tanda baca diabaikan, `M.Pd` = `M.Pd.`). Baris tanpa NIP yang namanya sama dengan baris ber-NIP digabung ke NIP tersebut. Nama tampilan: versi terpanjang. Pangkat/Gol: nilai non-kosong dan bukan `-` yang paling baru.
 

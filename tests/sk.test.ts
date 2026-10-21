@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { needsAttention, summarizeSk } from '@/lib/sk';
+import { summarizeSk } from '@/lib/sk';
 import { toViews } from '@/lib/view';
 import type { Assignment } from '@/lib/types';
 
@@ -29,11 +29,7 @@ describe('summarizeSk', () => {
     const sk1 = s[1];
     expect(sk1).toMatchObject({ tutorCount: 2, assignmentCount: 3, startMissing: 1 });
     expect(sk1.prodi).toHaveLength(2);
-    expect(sk1.status).toEqual({ aktif: 2, segera: 0, berakhir: 0, belum: 1 });
+    expect(sk1.status).toEqual({ aktif: 2, segera: 0, berakhir: 1, belum: 0 });
     expect(sk1.selesai).toBe('2026-12-31');
-  });
-  it('menandai SK yang perlu perhatian', () => {
-    expect(needsAttention(s[1])).toBe(true); // ada "belum diketahui"
-    expect(needsAttention(s[0])).toBe(false); // semuanya berakhir
   });
 });

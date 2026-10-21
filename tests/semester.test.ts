@@ -25,21 +25,31 @@ describe('semester', () => {
   });
 });
 
-describe('status dengan perkiraan', () => {
+describe('status dari tanggal akhir efektif', () => {
   const today = '2026-10-21';
-  it('tetap "belum", perkiraan di masa depan tidak ditandai lewat', () => {
+  it('selesai kosong: pakai perkiraan semester (masih ke depan = aktif)', () => {
     expect(getStatus({ tanggalMulai: '2026-08-21', tanggalSelesai: null }, today)).toMatchObject({
-      status: 'belum', estimatedEnd: '2026-12-31', estimateExpired: false,
+      status: 'aktif', endDate: '2026-12-31', endIsEstimate: true,
     });
   });
-  it('perkiraan yang sudah lewat hanya ditandai, bukan menjadi berakhir', () => {
+  it('perkiraan yang sudah lewat = berakhir', () => {
     expect(getStatus({ tanggalMulai: '2026-02-09', tanggalSelesai: null }, today)).toMatchObject({
-      status: 'belum', estimatedEnd: '2026-06-30', estimateExpired: true,
+      status: 'berakhir', endDate: '2026-06-30', endIsEstimate: true,
     });
   });
-  it('tanggal selesai terisi: tanpa perkiraan', () => {
-    expect(getStatus({ tanggalMulai: '2026-02-09', tanggalSelesai: '2026-12-31' }, today)).toMatchObject({
-      estimatedEnd: null, estimateExpired: false,
+  it('kolom perkiraan dari Sheet dipakai lebih dulu daripada hitungan', () => {
+    expect(getStatus({ tanggalMulai: '2026-02-09', tanggalSelesai: null, selesaiPerkiraan: '2026-12-31' }, today)).toMatchObject({
+      status: 'aktif', endDate: '2026-12-31', endIsEstimate: true,
+    });
+  });
+  it('tanggal selesai asli selalu mengalahkan perkiraan', () => {
+    expect(getStatus({ tanggalMulai: '2026-02-09', tanggalSelesai: '2026-11-10', selesaiPerkiraan: '2026-06-30' }, today)).toMatchObject({
+      status: 'segera', endDate: '2026-11-10', endIsEstimate: false,
+    });
+  });
+  it('tanpa dasar tanggal sama sekali: belum diisi', () => {
+    expect(getStatus({ tanggalMulai: null, tanggalSk: null, tanggalSelesai: null }, today)).toMatchObject({
+      status: 'belum', endDate: null,
     });
   });
 });

@@ -33,13 +33,14 @@ export const HEADERS = [
 ] as const;
 
 export const ID_HEADER = 'ID';
-export const SHEET_HEADERS = [...HEADERS, ID_HEADER];
+export const PERKIRAAN_HEADER = 'Selesai (perkiraan)';
+export const SHEET_HEADERS = [...HEADERS, ID_HEADER, PERKIRAAN_HEADER];
 
 export const STATUS_LABEL = {
   aktif: 'Aktif',
   segera: 'Segera berakhir',
   berakhir: 'Berakhir',
-  belum: 'Perkiraan masa tugas',
+  belum: 'Tanggal selesai belum diisi',
 } as const;
 
 /**
