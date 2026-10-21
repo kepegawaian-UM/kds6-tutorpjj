@@ -16,8 +16,7 @@ export function AsalSection({ data }: { data: AsalGroup[] }) {
   return (
     <div className="grid gap-4 lg:grid-cols-5">
       <section className="card p-4 lg:col-span-3" aria-label="Sebaran asal tutor">
-        <h2 className="mb-1 font-semibold">Sebaran asal tutor</h2>
-        <p className="mb-3 text-xs text-muted">Jumlah tutor unik per wilayah ({total} tutor). Klik batang untuk melihat daftar tutornya.</p>
+        <h2 className="mb-3 font-semibold">Asal tutor</h2>
         <div style={{ height: Math.max(220, data.length * 44) }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} layout="vertical" margin={{ left: 0, right: 24, top: 4, bottom: 4 }}>
@@ -42,8 +41,7 @@ export function AsalSection({ data }: { data: AsalGroup[] }) {
       </section>
 
       <section className="card p-4 lg:col-span-2" aria-label="Rincian asal institusi">
-        <h2 className="mb-1 font-semibold">Rincian institusi asal</h2>
-        <p className="mb-3 text-xs text-muted">Berdasarkan unit kerja terbaru tiap tutor.</p>
+        <h2 className="mb-3 font-semibold">Institusi asal</h2>
         <ul className="max-h-80 space-y-3 overflow-y-auto pr-1">
           {data.map((g) => (
             <li key={g.label}>

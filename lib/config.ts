@@ -50,3 +50,6 @@ export const SEMESTER_ENDS: [month: number, day: number][] = [
   [6, 30],
   [12, 31],
 ];
+
+/** Nama prodi tanpa awalan "S2 PJJ ". */
+export const shortProdi = (p: string) => p.replace(/^S2 PJJ\s+/i, '');

@@ -3,34 +3,19 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { IconCalendar, IconDownload, IconFile, IconHome, IconList, IconLogout, IconMenu, IconPlus, IconSearch, IconUsers } from './Icons';
+import { IconFile, IconHome, IconList, IconLogout, IconMenu, IconUsers } from './Icons';
 
-type Item = { href: string; label: string; icon: React.ReactNode; match?: (p: string) => boolean; download?: boolean };
-
-const GROUPS: { title: string; items: Item[] }[] = [
-  {
-    title: 'Data',
-    items: [
-      { href: '/', label: 'Ringkasan', icon: <IconHome />, match: (p) => p === '/' },
-      { href: '/penugasan', label: 'Daftar Penugasan', icon: <IconList />, match: (p) => p.startsWith('/penugasan') && p !== '/penugasan/baru' },
-      { href: '/sk', label: 'Daftar SK', icon: <IconFile />, match: (p) => p.startsWith('/sk') },
-      { href: '/tutor', label: 'Daftar Tutor', icon: <IconUsers />, match: (p) => p.startsWith('/tutor') },
-    ],
-  },
-  {
-    title: 'Aksi',
-    items: [
-      { href: '/penugasan/baru', label: 'Tambah Penugasan', icon: <IconPlus />, match: (p) => p === '/penugasan/baru' },
-      { href: '/api/export?format=xlsx', label: 'Ekspor Excel', icon: <IconDownload />, download: true },
-    ],
-  },
+const ITEMS = [
+  { href: '/', label: 'Ringkasan', icon: <IconHome />, match: (p: string) => p === '/' },
+  { href: '/penugasan', label: 'Penugasan', icon: <IconList />, match: (p: string) => p.startsWith('/penugasan') },
+  { href: '/sk', label: 'SK', icon: <IconFile />, match: (p: string) => p.startsWith('/sk') },
+  { href: '/tutor', label: 'Tutor', icon: <IconUsers />, match: (p: string) => p.startsWith('/tutor') },
 ];
 
-export function AppShell({ children, todayLabel }: { children: React.ReactNode; todayLabel: string }) {
+export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [q, setQ] = useState('');
 
   useEffect(() => setOpen(false), [pathname]);
 
@@ -42,7 +27,7 @@ export function AppShell({ children, todayLabel }: { children: React.ReactNode; 
 
   const sidebar = (
     <div className="flex h-full flex-col bg-sidebar text-cream">
-      <div className="flex items-center gap-3 px-5 py-5">
+      <div className="flex items-center gap-3 px-5 py-6">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo.png" alt="" className="h-9 w-auto" />
         <div className="leading-tight">
@@ -50,42 +35,39 @@ export function AppShell({ children, todayLabel }: { children: React.ReactNode; 
           <p className="text-xs text-cream/70">Tutor PJJ</p>
         </div>
       </div>
-      <nav aria-label="Navigasi utama" className="flex-1 overflow-y-auto px-3 pb-4">
-        {GROUPS.map((g) => (
-          <div key={g.title} className="mt-4">
-            <p className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-cream/50">{g.title}</p>
-            {g.items.map((i) => {
-              const active = i.match?.(pathname) ?? false;
-              const cls = `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+      <nav aria-label="Navigasi utama" className="flex-1 space-y-1 px-3">
+        {ITEMS.map((i) => {
+          const active = i.match(pathname);
+          return (
+            <Link
+              key={i.href}
+              href={i.href}
+              aria-current={active ? 'page' : undefined}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
                 active ? 'bg-white/10 font-medium text-white' : 'text-cream/80 hover:bg-white/5 hover:text-white'
-              }`;
-              return i.download ? (
-                <a key={i.href} href={i.href} className={cls}>{i.icon}{i.label}</a>
-              ) : (
-                <Link key={i.href} href={i.href} aria-current={active ? 'page' : undefined} className={cls}>{i.icon}{i.label}</Link>
-              );
-            })}
-          </div>
-        ))}
+              }`}
+            >
+              {i.icon}
+              {i.label}
+            </Link>
+          );
+        })}
       </nav>
       <div className="border-t border-white/10 p-4">
-        <div className="flex items-center gap-3">
-          <span className="grid size-9 place-items-center rounded-full bg-white/15 text-sm font-semibold text-white">A</span>
-          <div className="min-w-0 flex-1 leading-tight">
-            <p className="truncate text-sm font-medium text-white">Admin</p>
-            <p className="truncate text-xs text-cream/60">Administrator tunggal</p>
-          </div>
-          <button onClick={logout} title="Keluar" aria-label="Keluar" className="rounded-md p-2 text-cream/80 hover:bg-white/10 hover:text-white">
-            <IconLogout />
-          </button>
-        </div>
+        <button
+          onClick={logout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-cream/80 hover:bg-white/5 hover:text-white"
+        >
+          <IconLogout />
+          Keluar
+        </button>
       </div>
     </div>
   );
 
   return (
     <div className="min-h-dvh">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 lg:block">{sidebar}</aside>
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-56 lg:block">{sidebar}</aside>
 
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
@@ -94,34 +76,15 @@ export function AppShell({ children, todayLabel }: { children: React.ReactNode; 
         </div>
       )}
 
-      <div className="lg:pl-60">
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-white/95 px-4 py-3 backdrop-blur sm:px-8">
-          <button className="btn !min-h-9 !px-2.5 lg:hidden" onClick={() => setOpen(true)} aria-label="Buka menu">
+      <div className="lg:pl-56">
+        {/* Bilah atas hanya untuk HP (tombol menu). */}
+        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
+          <button className="btn !min-h-9 !px-2.5" onClick={() => setOpen(true)} aria-label="Buka menu">
             <IconMenu />
           </button>
-          <form
-            role="search"
-            className="relative max-w-md flex-1"
-            onSubmit={(e) => {
-              e.preventDefault();
-              router.push(q.trim() ? `/penugasan?q=${encodeURIComponent(q.trim())}` : '/penugasan');
-            }}
-          >
-            <IconSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              className="field !pl-9"
-              placeholder="Cari NIP atau nama tutor…"
-              aria-label="Cari penugasan"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-            />
-          </form>
-          <span className="ml-auto hidden whitespace-nowrap items-center gap-2 rounded-full bg-accent-soft px-3 py-1.5 text-xs font-medium sm:inline-flex">
-            <IconCalendar /> Posisi: {todayLabel}
-          </span>
-          <span className="ml-auto grid size-9 shrink-0 place-items-center rounded-full bg-accent text-sm font-semibold text-accent-fg sm:ml-0" aria-hidden="true">A</span>
+          <span className="text-sm font-semibold">KDS6 Tutor PJJ</span>
         </header>
-        <main className="mx-auto max-w-6xl px-4 py-6 sm:px-8 sm:py-8">{children}</main>
+        <main className="mx-auto max-w-6xl px-4 py-6 sm:px-10 sm:py-10">{children}</main>
       </div>
     </div>
   );

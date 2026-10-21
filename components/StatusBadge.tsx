@@ -1,4 +1,4 @@
-import { STATUS_LABEL } from '@/lib/config';
+import { STATUS_LABEL, shortProdi } from '@/lib/config';
 import type { StatusKey } from '@/lib/types';
 import { formatDate } from '@/lib/dates';
 import type { Renewal } from '@/lib/view';
@@ -20,7 +20,7 @@ function belumLabel(estimatedEnd?: string | null, expired?: boolean): string {
 
 export function RenewalHint({ renewal }: { renewal: Renewal | null | undefined }) {
   if (!renewal) return null;
-  const prodi = renewal.prodi?.replace(/^S2 PJJs+/i, '');
+  const prodi = renewal.prodi ? shortProdi(renewal.prodi) : undefined;
   if (renewal.kind === 'sama') {
     return <span className="block w-full max-w-[14rem] text-xs text-emerald-700">Sudah ada SK lebih baru di prodi ini: {renewal.noSk}</span>;
   }

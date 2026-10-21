@@ -4,8 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { JENIS_PEGAWAI } from '@/lib/config';
-import { formatDate } from '@/lib/dates';
-import { estimateEnd, isSemesterEnd } from '@/lib/semester';
+import { isSemesterEnd } from '@/lib/semester';
 import { findSimilarNames, nameKey } from '@/lib/tutors';
 import type { Tutor } from '@/lib/types';
 import { assignmentSchema, composeJudulSk, fieldErrors, type AssignmentFormValues } from '@/lib/validation';
@@ -127,10 +126,6 @@ export function AssignmentForm({ mode, id, initial, tutors, sks, prodiOptions, r
     }
   }
 
-  const est = v.tanggalSelesai ? null : estimateEnd({ tanggalMulai: v.tanggalMulai || null, tanggalSk: v.tanggalSk || null, tanggalSelesai: null });
-  const selesaiHint = est
-    ? `Boleh kosong. Akan tampil sebagai perkiraan menurut semester: ${formatDate(est)}.`
-    : 'Boleh kosong. Tanpa tanggal mulai atau SK, perkiraan tidak bisa dihitung.';
   const offSemester = !!v.tanggalSelesai && !isSemesterEnd(v.tanggalSelesai);
 
   const inv = (k: string) => ({ 'aria-invalid': !!errors[k], 'aria-describedby': errors[k] ? `${k}-err` : undefined });
@@ -140,14 +135,9 @@ export function AssignmentForm({ mode, id, initial, tutors, sks, prodiOptions, r
     <form onSubmit={onSubmit} noValidate className="space-y-6">
       <section className="card space-y-4 p-4">
         <h2 className="font-semibold">Tutor</h2>
-        <Field label="Nama" htmlFor="nama" error={errors.nama} hint="Ketik untuk memilih tutor yang sudah ada.">
+        <Field label="Nama" htmlFor="nama" error={errors.nama}>
           <input id="nama" className="field" list="tutor-names" autoComplete="off" value={v.nama} onChange={(e) => onNama(e.target.value)} {...inv('nama')} />
           <datalist id="tutor-names">{tutorNames.map((n) => <option key={n} value={n} />)}</datalist>
-          {matched && mode === 'create' && (
-            <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">
-              Tutor sudah terdaftar ({matched.jumlahPenugasan} penugasan). Data profil diisi otomatis dan masih bisa diubah.
-            </p>
-          )}
           {similar.length > 0 && (
             <div role="status" className="mt-2 rounded-lg border border-yellow-300 bg-yellow-50 p-3 text-xs text-yellow-900 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-200">
               Nama ini mirip dengan tutor yang sudah ada. Apakah orang yang sama?
@@ -168,7 +158,7 @@ export function AssignmentForm({ mode, id, initial, tutors, sks, prodiOptions, r
           )}
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="NIP" htmlFor="nip" error={errors.nip} hint="Kosongkan bila tidak ada. Jika diisi, 18 digit.">
+          <Field label="NIP" htmlFor="nip" error={errors.nip}>
             <input id="nip" inputMode="numeric" className="field" value={v.nip} onChange={(e) => set('nip', e.target.value)} {...inv('nip')} />
           </Field>
           <Field label="Pangkat/Gol" htmlFor="pangkat" error={errors.pangkat}>
@@ -225,7 +215,7 @@ export function AssignmentForm({ mode, id, initial, tutors, sks, prodiOptions, r
               />
             )}
           </Field>
-          <Field label="Jabatan tugas" htmlFor="jabatanTugas" error={errors.jabatanTugas} hint="Mis. Tutor PJJ Evaluasi Pembelajaran">
+          <Field label="Jabatan tugas" htmlFor="jabatanTugas" error={errors.jabatanTugas}>
             <input id="jabatanTugas" className="field" value={v.jabatanTugas} onChange={(e) => set('jabatanTugas', e.target.value)} />
           </Field>
         </div>
@@ -234,7 +224,7 @@ export function AssignmentForm({ mode, id, initial, tutors, sks, prodiOptions, r
       <section className="card space-y-4 p-4">
         <h2 className="font-semibold">Surat keputusan</h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="No SK / Nomor ST" htmlFor="noSk" error={errors.noSk} hint="Pilih dari SK yang sudah ada untuk mengisi tanggal dan judul otomatis.">
+          <Field label="No SK / Nomor ST" htmlFor="noSk" error={errors.noSk}>
             <input id="noSk" className="field" list="sk-list" autoComplete="off" value={v.noSk} onChange={(e) => onNoSk(e.target.value)} {...inv('noSk')} />
             <datalist id="sk-list">{sks.map((s) => <option key={s.noSk} value={s.noSk} />)}</datalist>
           </Field>
@@ -242,7 +232,7 @@ export function AssignmentForm({ mode, id, initial, tutors, sks, prodiOptions, r
             <input id="tanggalSk" type="date" className="field" value={v.tanggalSk} onChange={(e) => set('tanggalSk', e.target.value)} {...inv('tanggalSk')} />
           </Field>
           <div className="sm:col-span-2">
-            <Field label="Judul SK" htmlFor="judulSk" error={errors.judulSk} hint="Kosongkan untuk disusun otomatis dari prodi.">
+            <Field label="Judul SK" htmlFor="judulSk" error={errors.judulSk}>
               <textarea
                 id="judulSk"
                 rows={3}
@@ -259,10 +249,10 @@ export function AssignmentForm({ mode, id, initial, tutors, sks, prodiOptions, r
       <section className="card space-y-4 p-4">
         <h2 className="font-semibold">Masa tugas</h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Tanggal mulai" htmlFor="tanggalMulai" error={errors.tanggalMulai} hint="Boleh kosong.">
+          <Field label="Tanggal mulai" htmlFor="tanggalMulai" error={errors.tanggalMulai}>
             <input id="tanggalMulai" type="date" className="field" value={v.tanggalMulai} onChange={(e) => set('tanggalMulai', e.target.value)} {...inv('tanggalMulai')} />
           </Field>
-          <Field label="Tanggal selesai" htmlFor="tanggalSelesai" error={errors.tanggalSelesai} hint={selesaiHint}>
+          <Field label="Tanggal selesai" htmlFor="tanggalSelesai" error={errors.tanggalSelesai}>
             <input id="tanggalSelesai" type="date" className="field" min={v.tanggalMulai || undefined} value={v.tanggalSelesai} onChange={(e) => set('tanggalSelesai', e.target.value)} {...inv('tanggalSelesai')} />
           </Field>
         </div>

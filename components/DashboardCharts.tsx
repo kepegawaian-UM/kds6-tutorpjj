@@ -27,9 +27,8 @@ export function DashboardCharts({ prodi, jenis }: { prodi: Slice[]; jenis: Slice
   return (
     <div className="grid gap-4 lg:grid-cols-5">
       <section className="card p-4 lg:col-span-3" aria-label="Penugasan per prodi">
-        <h2 className="mb-1 font-semibold">Penugasan per prodi</h2>
-        <p className="mb-3 text-xs text-muted">Klik batang untuk memfilter daftar penugasan.</p>
-        <div style={{ height: Math.max(220, prodi.length * 46) }}>
+        <h2 className="mb-3 font-semibold">Penugasan per prodi</h2>
+                <div style={{ height: Math.max(220, prodi.length * 46) }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={prodi} layout="vertical" margin={{ left: 0, right: 24, top: 4, bottom: 4 }}>
               <XAxis type="number" allowDecimals={false} tick={{ fill: 'var(--muted)', fontSize: 12 }} axisLine={false} tickLine={false} />
@@ -62,9 +61,8 @@ export function DashboardCharts({ prodi, jenis }: { prodi: Slice[]; jenis: Slice
       </section>
 
       <section className="card p-4 lg:col-span-2" aria-label="Komposisi jenis pegawai">
-        <h2 className="mb-1 font-semibold">Komposisi jenis pegawai</h2>
-        <p className="mb-3 text-xs text-muted">Klik bagian donat atau keterangan untuk memfilter.</p>
-        <div className="h-48">
+        <h2 className="mb-3 font-semibold">Jenis pegawai</h2>
+                <div className="h-48">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie

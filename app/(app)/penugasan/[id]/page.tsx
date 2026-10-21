@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { AssignmentForm } from '@/components/AssignmentForm';
-import { StartMissingBadge, StatusBadge } from '@/components/StatusBadge';
+import { StatusBadge } from '@/components/StatusBadge';
 import { ErrorState, PageHeader } from '@/components/States';
 import { buildFormContext, toFormValues } from '@/lib/form-data';
 import { loadViews } from '@/lib/load';
@@ -29,7 +29,6 @@ export default async function EditAssignmentPage({ params }: { params: Promise<{
       <PageHeader title="Ubah penugasan" subtitle={`${row.nama} · ${row.prodi}`} />
       <div className="-mt-3 mb-5 flex flex-wrap gap-1.5">
         <StatusBadge status={row.status} daysLeft={row.daysLeft} estimatedEnd={row.estimatedEnd} estimateExpired={row.estimateExpired} renewal={row.renewal} />
-        {row.startMissing && <StartMissingBadge />}
       </div>
       <AssignmentForm
         mode="edit"

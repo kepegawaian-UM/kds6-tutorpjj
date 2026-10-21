@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { DeleteButton } from '@/components/DeleteButton';
-import { IconEdit, IconPlus } from '@/components/Icons';
-import { StartMissingBadge, StatusBadge } from '@/components/StatusBadge';
+import { IconPlus } from '@/components/Icons';
+import { StatusBadge } from '@/components/StatusBadge';
 import { ErrorState, PageHeader } from '@/components/States';
+import { shortProdi } from '@/lib/config';
 import { formatDate } from '@/lib/dates';
 import { loadViews } from '@/lib/load';
 import { findTutorByKey } from '@/lib/tutors';
@@ -39,42 +39,37 @@ export default async function TutorDetailPage({ params }: { params: Promise<{ ke
 
   return (
     <>
-      <p className="mb-2 text-sm"><Link href="/tutor" className="text-muted hover:text-accent">← Semua tutor</Link></p>
+      <p className="mb-3 text-sm"><Link href="/tutor" className="text-muted hover:text-accent">← Tutor</Link></p>
       <PageHeader
         title={tutor.nama}
-        subtitle={`${tutor.jumlahPenugasan} penugasan`}
-        actions={
+                actions={
           <Link href={`/penugasan/baru?tutor=${encodeURIComponent(tutor.key)}`} className="btn btn-primary">
-            <IconPlus /> Tambah penugasan untuk tutor ini
+            <IconPlus /> Tambah Penugasan
           </Link>
         }
       />
 
       <section className="card mb-6 p-4" aria-label="Profil tutor">
         <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
-          {profile.map(([k, v]) => (
+          {profile.filter(([, v]) => v).map(([k, v]) => (
             <div key={k}>
               <dt className="text-xs text-muted">{k}</dt>
-              <dd className="text-sm">{v || <span className="text-muted">—</span>}</dd>
+              <dd className="text-sm">{v}</dd>
             </div>
           ))}
         </dl>
       </section>
 
-      <h2 className="mb-2 text-lg font-semibold">Riwayat penugasan</h2>
+      <h2 className="mb-3 text-lg font-semibold">Riwayat penugasan</h2>
       <ol className="space-y-3">
         {rows.map((r) => {
           const v = byId.get(r.id)!;
           return (
             <li key={r.id} className="card p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
-                <div>
-                  <p className="font-medium">{r.prodi}</p>
-                  <p className="text-sm text-muted">{r.jabatanTugas || 'Jabatan tugas belum diisi'}</p>
-                </div>
+                <p className="font-medium">{shortProdi(r.prodi)}</p>
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <StatusBadge status={v.status} daysLeft={v.daysLeft} estimatedEnd={v.estimatedEnd} estimateExpired={v.estimateExpired} renewal={v.renewal} />
-                  {v.startMissing && <StartMissingBadge />}
+                  <StatusBadge status={v.status} daysLeft={v.daysLeft} estimatedEnd={v.estimatedEnd} estimateExpired={v.estimateExpired} />
                 </div>
               </div>
               <dl className="mt-3 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-[auto_1fr]">
@@ -84,13 +79,8 @@ export default async function TutorDetailPage({ params }: { params: Promise<{ ke
                 <dd className="tabular-nums">
                   {r.tanggalMulai ? formatDate(r.tanggalMulai) : '?'} – {r.tanggalSelesai ? formatDate(r.tanggalSelesai) : '?'}
                 </dd>
-                <dt className="text-muted">Unit kerja</dt>
-                <dd>{r.unitKerja || '—'}</dd>
               </dl>
-              <div className="mt-3 flex gap-2">
-                <Link href={`/penugasan/${r.id}`} className="btn !min-h-9"><IconEdit /> Ubah</Link>
-                <DeleteButton id={r.id} nama={r.nama} detail={r.prodi} />
-              </div>
+              <Link href={`/penugasan/${r.id}`} className="link-text mt-3 inline-block">Ubah</Link>
             </li>
           );
         })}

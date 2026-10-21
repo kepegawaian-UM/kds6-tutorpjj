@@ -1,11 +1,10 @@
 import Link from 'next/link';
 import { AsalSection } from '@/components/AsalSection';
 import { DashboardCharts, type Slice } from '@/components/DashboardCharts';
-import { StartMissingBadge, StatusBadge } from '@/components/StatusBadge';
+import { StatusBadge } from '@/components/StatusBadge';
 import { EmptyState, ErrorState, PageHeader } from '@/components/States';
 import { asalBreakdown } from '@/lib/asal';
-import { DEFAULT_PRODI, JENIS_PEGAWAI, STATUS_LABEL } from '@/lib/config';
-import { formatDate } from '@/lib/dates';
+import { DEFAULT_PRODI, JENIS_PEGAWAI, STATUS_LABEL, shortProdi } from '@/lib/config';
 import { loadViews } from '@/lib/load';
 import { groupTutors } from '@/lib/tutors';
 import type { StatusKey } from '@/lib/types';
@@ -31,17 +30,13 @@ const CARD_STATUS: { key: StatusKey; tone: string }[] = [
 function AttentionItem({ r }: { r: AssignmentView }) {
   return (
     <li>
-      <Link href={`/penugasan/${r.id}`} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-3 hover:bg-surface-2">
+      <Link href={`/penugasan/${r.id}`} className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-surface-2">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{r.nama}</p>
-          <p className="truncate text-xs text-muted">
-            {r.prodi} · {r.noSk}
-            {r.tanggalSelesai && <> · selesai {formatDate(r.tanggalSelesai)}</>}
-          </p>
+          <p className="truncate text-xs text-muted">{shortProdi(r.prodi)}</p>
         </div>
-        <div className="flex max-w-[15rem] flex-wrap items-center gap-1.5 sm:justify-end">
-          <StatusBadge status={r.status} daysLeft={r.daysLeft} estimatedEnd={r.estimatedEnd} estimateExpired={r.estimateExpired} renewal={r.renewal} />
-          {r.startMissing && <StartMissingBadge />}
+        <div className="shrink-0">
+          <StatusBadge status={r.status} daysLeft={r.daysLeft} estimatedEnd={r.estimatedEnd} estimateExpired={r.estimateExpired} />
         </div>
       </Link>
     </li>
@@ -58,7 +53,7 @@ export default async function DashboardPage() {
       </>
     );
   }
-  const { views, today } = res;
+  const { views } = res;
   if (!views.length) {
     return (
       <>
@@ -72,9 +67,8 @@ export default async function DashboardPage() {
 
   const count = (s: StatusKey) => views.filter((v) => v.status === s).length;
   const soon = views.filter((v) => v.status === 'segera').sort((a, b) => a.daysLeft! - b.daysLeft!);
-  const unknown = views.filter((v) => v.status === 'belum');
-  const expired = unknown.filter((v) => v.estimateExpired);
-  const renewCount = (k: 'sama' | 'lain' | 'tidak') => expired.filter((v) => v.renewal?.kind === k).length;
+  // Perlu dilengkapi: tanpa tanggal selesai dan perkiraannya sudah lewat (atau tidak bisa diperkirakan).
+  const incomplete = views.filter((v) => v.status === 'belum' && (v.estimateExpired || !v.estimatedEnd));
 
   const summary = [
     { label: 'Tutor unik', value: groupTutors(views).length, href: '/tutor' },
@@ -84,7 +78,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <PageHeader title="Dashboard" subtitle={`Posisi per ${formatDate(today)} (WIB)`} />
+      <PageHeader title="Dashboard" />
 
       <section aria-label="Ringkasan" className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-7">
         {summary.map((s) => (
@@ -101,39 +95,31 @@ export default async function DashboardPage() {
         ))}
       </section>
 
-      <section aria-label="Perlu perhatian" className="mt-6">
-        <h2 className="mb-2 text-lg font-semibold">Perlu perhatian</h2>
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="card overflow-hidden">
-            <h3 className="border-b border-border px-4 py-2.5 text-sm font-semibold">
-              Segera berakhir <span className="font-normal text-muted">({soon.length})</span>
-            </h3>
-            {soon.length ? (
-              <ul className="divide-y divide-border">{soon.map((r) => <AttentionItem key={r.id} r={r} />)}</ul>
-            ) : (
-              <p className="px-4 py-6 text-center text-sm text-muted">Tidak ada penugasan yang segera berakhir.</p>
+      {(soon.length > 0 || incomplete.length > 0) && (
+        <section aria-label="Perlu perhatian" className="mt-8">
+          <h2 className="mb-3 text-lg font-semibold">Perlu perhatian</h2>
+          <div className="grid gap-4 lg:grid-cols-2">
+            {soon.length > 0 && (
+              <div className="card overflow-hidden">
+                <h3 className="border-b border-border px-4 py-3 text-sm font-semibold">
+                  Segera berakhir <span className="font-normal text-muted">({soon.length})</span>
+                </h3>
+                <ul className="max-h-96 divide-y divide-border overflow-y-auto">{soon.map((r) => <AttentionItem key={r.id} r={r} />)}</ul>
+              </div>
+            )}
+            {incomplete.length > 0 && (
+              <div className="card overflow-hidden">
+                <h3 className="border-b border-border px-4 py-3 text-sm font-semibold">
+                  Perlu dilengkapi <span className="font-normal text-muted">({incomplete.length})</span>
+                </h3>
+                <ul className="max-h-96 divide-y divide-border overflow-y-auto">{incomplete.map((r) => <AttentionItem key={r.id} r={r} />)}</ul>
+              </div>
             )}
           </div>
-          <div className="card overflow-hidden border-yellow-300 dark:border-yellow-800">
-            <h3 className="border-b border-border px-4 py-2.5 text-sm font-semibold">
-              Perkiraan masa tugas <span className="font-normal text-muted">({unknown.length})</span>
-            </h3>
-            {expired.length > 0 && (
-              <p className="border-b border-border bg-surface-2 px-4 py-2 text-xs text-muted">
-                {expired.length} perkiraannya sudah lewat: {renewCount('sama')} ada SK baru di prodi yang sama,{' '}
-                {renewCount('lain')} bertugas di prodi lain, <strong className="text-orange-700">{renewCount('tidak')} tanpa SK baru (perlu verifikasi)</strong>.
-              </p>
-            )}
-            {unknown.length ? (
-              <ul className="max-h-96 divide-y divide-border overflow-y-auto">{unknown.map((r) => <AttentionItem key={r.id} r={r} />)}</ul>
-            ) : (
-              <p className="px-4 py-6 text-center text-sm text-muted">Semua penugasan sudah memiliki tanggal selesai.</p>
-            )}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      <section className="mt-6" aria-label="Grafik">
+      <section className="mt-8" aria-label="Grafik">
         <DashboardCharts
           prodi={countBy(views, (v) => v.prodi, DEFAULT_PRODI)}
           jenis={countBy(views, (v) => v.jenisPegawai, JENIS_PEGAWAI)}

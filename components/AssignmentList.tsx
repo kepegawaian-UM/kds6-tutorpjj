@@ -3,18 +3,16 @@
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { STATUS_LABEL } from '@/lib/config';
+import { STATUS_LABEL, shortProdi } from '@/lib/config';
 import { formatDate } from '@/lib/dates';
 import { EMPTY_FILTERS, applyFilters, filtersToParams, parseFilters, type Filters } from '@/lib/filters';
 import type { AssignmentView } from '@/lib/view';
-import { DeleteButton } from './DeleteButton';
-import { IconDownload, IconEdit, IconPlus, IconSort } from './Icons';
-import { StartMissingBadge, StatusBadge } from './StatusBadge';
+import { IconDownload, IconPlus, IconSort } from './Icons';
+import { StatusBadge } from './StatusBadge';
 
 interface Props {
   views: AssignmentView[];
   prodiOptions: string[];
-  jenisOptions: string[];
   skOptions: string[];
 }
 
@@ -31,13 +29,12 @@ function Period({ r }: { r: AssignmentView }) {
 function Badges({ r }: { r: AssignmentView }) {
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      <StatusBadge status={r.status} daysLeft={r.daysLeft} estimatedEnd={r.estimatedEnd} estimateExpired={r.estimateExpired} renewal={r.renewal} />
-      {r.startMissing && <StartMissingBadge />}
+      <StatusBadge status={r.status} daysLeft={r.daysLeft} estimatedEnd={r.estimatedEnd} estimateExpired={r.estimateExpired} />
     </div>
   );
 }
 
-export function AssignmentList({ views, prodiOptions, jenisOptions, skOptions }: Props) {
+export function AssignmentList({ views, prodiOptions, skOptions }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
@@ -80,70 +77,49 @@ export function AssignmentList({ views, prodiOptions, jenisOptions, skOptions }:
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Daftar Penugasan</h1>
-        <p className="mt-1 text-sm text-muted" aria-live="polite">
-          {rows.length === views.length ? `${views.length} penugasan` : `${rows.length} dari ${views.length} penugasan`}. Data dibaca langsung dari Google Sheets.
-        </p>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Penugasan</h1>
         <div className="mt-4 flex flex-wrap gap-2">
           <a className="btn" href={exportHref('xlsx')}><IconDownload /> Export Excel</a>
-          <a className="btn" href={exportHref('csv')}><IconDownload /> Export CSV</a>
           <Link className="btn btn-primary" href="/penugasan/baru"><IconPlus /> Tambah Penugasan</Link>
         </div>
       </div>
 
-      <div className="card mb-5 p-4">
-        <div className="mb-3">
+      <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))_auto] lg:items-end">
+        <div>
           <label htmlFor="f-q" className="mb-1 block text-sm">Cari</label>
-          <input
-            id="f-q"
-            type="search"
-            className="field"
-            placeholder="Nama, NIP, unit kerja, atau no SK…"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-          />
+          <input id="f-q" type="search" className="field" placeholder="Nama, unit kerja, atau no SK" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
-        <div className="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto]">
-          <div>
-            <label htmlFor="f-prodi" className="mb-1 block text-sm">Prodi</label>
-            <select id="f-prodi" className="field" value={f.prodi} onChange={(e) => update({ prodi: e.target.value })}>
-              <option value="">Semua</option>
-              {prodiOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="f-jenis" className="mb-1 block text-sm">Jenis Pegawai</label>
-            <select id="f-jenis" className="field" value={f.jenis} onChange={(e) => update({ jenis: e.target.value })}>
-              <option value="">Semua</option>
-              {jenisOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="f-status" className="mb-1 block text-sm">Status</label>
-            <select id="f-status" className="field" value={f.status} onChange={(e) => update({ status: e.target.value as Filters['status'] })}>
-              <option value="">Semua</option>
-              {(Object.keys(STATUS_LABEL) as (keyof typeof STATUS_LABEL)[]).map((k) => (
-                <option key={k} value={k}>{STATUS_LABEL[k]}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="f-sk" className="mb-1 block text-sm">No SK</label>
-            <select id="f-sk" className="field" value={f.sk} onChange={(e) => update({ sk: e.target.value })}>
-              <option value="">Semua</option>
-              {skOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-            </select>
-          </div>
-          <button className="btn" onClick={() => router.replace(pathname, { scroll: false })} disabled={!active}>
-            Reset
-          </button>
+        <div>
+          <label htmlFor="f-prodi" className="mb-1 block text-sm">Prodi</label>
+          <select id="f-prodi" className="field" value={f.prodi} onChange={(e) => update({ prodi: e.target.value })}>
+            <option value="">Semua</option>
+            {prodiOptions.map((o) => <option key={o} value={o}>{shortProdi(o)}</option>)}
+          </select>
         </div>
+        <div>
+          <label htmlFor="f-status" className="mb-1 block text-sm">Status</label>
+          <select id="f-status" className="field" value={f.status} onChange={(e) => update({ status: e.target.value as Filters['status'] })}>
+            <option value="">Semua</option>
+            {(Object.keys(STATUS_LABEL) as (keyof typeof STATUS_LABEL)[]).map((k) => (
+              <option key={k} value={k}>{STATUS_LABEL[k]}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="f-sk" className="mb-1 block text-sm">No SK</label>
+          <select id="f-sk" className="field" value={f.sk} onChange={(e) => update({ sk: e.target.value })}>
+            <option value="">Semua</option>
+            {skOptions.map((o) => <option key={o} value={o}>{o}</option>)}
+          </select>
+        </div>
+        {active && (
+          <button className="btn" onClick={() => router.replace(pathname, { scroll: false })}>Reset</button>
+        )}
       </div>
 
       {rows.length === 0 ? (
         <div className="card p-8 text-center">
           <p className="font-medium">Tidak ada penugasan yang cocok</p>
-          <p className="mt-1 text-sm text-muted">Ubah kata kunci atau reset filter.</p>
         </div>
       ) : (
         <>
@@ -152,32 +128,26 @@ export function AssignmentList({ views, prodiOptions, jenisOptions, skOptions }:
             <table className="w-full text-sm">
               <thead className="border-b border-border bg-surface-2 text-[11px] text-muted">
                 <tr>
-                  <Th k="no">No</Th>
                   <Th k="nama">Nama</Th>
-                  <Th k="prodi">Prodi / Jenis</Th>
+                  <Th k="prodi">Prodi</Th>
                   <Th k="sk">No SK</Th>
                   <Th k="mulai">Periode</Th>
                   <Th k="status">Status</Th>
-                  <th className="px-3 py-2.5"><span className="sr-only">Aksi</span></th>
+                  <th className="px-3 py-3"><span className="sr-only">Aksi</span></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {rows.map((r) => (
                   <tr key={r.id} className="align-top hover:bg-surface-2/60">
-                    <td className="px-3 py-3.5 tabular-nums text-muted">{r.no}</td>
                     <td className="px-3 py-3.5">
                       <Link href={`/tutor/${r.tutorKey}`} className="font-medium hover:text-accent hover:underline">{r.nama}</Link>
-                      <div className="text-xs text-muted">{r.jabatanTugas}</div>
                     </td>
-                    <td className="px-3 py-3.5">{r.prodi.replace(/^S2 PJJ\s+/i, '')}<div className="text-xs text-muted">{r.jenisPegawai}</div></td>
+                    <td className="px-3 py-3.5">{shortProdi(r.prodi)}</td>
                     <td className="px-3 py-3.5 text-xs">{r.noSk}</td>
                     <td className="px-3 py-3.5 text-xs"><Period r={r} /></td>
                     <td className="px-3 py-3.5"><Badges r={r} /></td>
                     <td className="px-3 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <Link href={`/penugasan/${r.id}`} className="link-text" aria-label={`Ubah penugasan ${r.nama}`}>Ubah</Link>
-                        <DeleteButton id={r.id} nama={r.nama} detail={r.prodi} iconOnly />
-                      </div>
+                      <Link href={`/penugasan/${r.id}`} className="link-text" aria-label={`Ubah penugasan ${r.nama}`}>Ubah</Link>
                     </td>
                   </tr>
                 ))}
@@ -190,23 +160,12 @@ export function AssignmentList({ views, prodiOptions, jenisOptions, skOptions }:
             {rows.map((r) => (
               <li key={r.id} className="card p-4">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <Link href={`/tutor/${r.tutorKey}`} className="font-medium hover:text-accent">{r.nama}</Link>
-                    <p className="text-xs text-muted">{r.jabatanTugas}</p>
-                  </div>
-                  <span className="text-xs tabular-nums text-muted">#{r.no}</span>
+                  <Link href={`/tutor/${r.tutorKey}`} className="font-medium hover:text-accent">{r.nama}</Link>
+                  <Link href={`/penugasan/${r.id}`} className="link-text shrink-0">Ubah</Link>
                 </div>
-                <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
-                  <dt className="text-muted">Prodi</dt><dd>{r.prodi}</dd>
-                  <dt className="text-muted">Jenis</dt><dd>{r.jenisPegawai}</dd>
-                  <dt className="text-muted">No SK</dt><dd className="break-all">{r.noSk}</dd>
-                  <dt className="text-muted">Periode</dt><dd><Period r={r} /></dd>
-                </dl>
+                <p className="mt-1 text-sm text-muted">{shortProdi(r.prodi)}</p>
+                <p className="mt-1 text-xs text-muted"><Period r={r} /> · {r.noSk}</p>
                 <div className="mt-3"><Badges r={r} /></div>
-                <div className="mt-3 flex gap-2">
-                  <Link href={`/penugasan/${r.id}`} className="btn flex-1"><IconEdit /> Ubah</Link>
-                  <DeleteButton id={r.id} nama={r.nama} detail={r.prodi} />
-                </div>
               </li>
             ))}
           </ul>

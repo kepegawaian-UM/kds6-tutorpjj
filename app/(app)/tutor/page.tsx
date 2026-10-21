@@ -28,22 +28,17 @@ export default async function TutorListPage({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <PageHeader title="Daftar tutor" subtitle={`${all.length} tutor unik dari ${res.views.length} penugasan`} />
-      <form className="mb-4 flex gap-2" role="search">
-        {asal && <input type="hidden" name="asal" value={asal} />}
-        <input name="q" defaultValue={q} className="field" placeholder="Cari nama, NIP, atau unit kerja…" aria-label="Cari tutor" />
-        <button className="btn">Cari</button>
-      </form>
+      <PageHeader title="Tutor" subtitle={`${all.length} tutor`} />
 
       {asal && (
         <p className="mb-3 flex flex-wrap items-center gap-2 text-sm">
           Asal: <span className="rounded-full bg-accent-soft px-2.5 py-0.5 font-medium">{asal}</span>
-          <Link href={q ? `/tutor?q=${encodeURIComponent(q)}` : '/tutor'} className="text-muted underline hover:text-accent">Hapus filter</Link>
+          <Link href="/tutor" className="text-muted underline hover:text-accent">Hapus filter</Link>
         </p>
       )}
 
       {tutors.length === 0 ? (
-        <EmptyState title="Tutor tidak ditemukan">Coba kata kunci lain.</EmptyState>
+        <EmptyState title="Tutor tidak ditemukan" />
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {tutors.map((t) => (
@@ -55,9 +50,7 @@ export default async function TutorListPage({ searchParams }: { searchParams: Pr
                     {t.jumlahPenugasan} penugasan
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-muted">{t.jenisPegawai}</p>
-                <p className="mt-2 text-sm">{t.unitKerja || <span className="text-muted">Unit kerja belum diisi</span>}</p>
-                {t.nip && <p className="mt-1 text-xs text-muted">NIP {t.nip}</p>}
+                <p className="mt-2 text-sm text-muted">{t.unitKerja}</p>
               </Link>
             </li>
           ))}

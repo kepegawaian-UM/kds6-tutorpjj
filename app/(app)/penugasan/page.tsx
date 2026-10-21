@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { AssignmentList } from '@/components/AssignmentList';
 import { EmptyState, ErrorState, PageHeader } from '@/components/States';
-import { DEFAULT_PRODI, JENIS_PEGAWAI } from '@/lib/config';
+import { DEFAULT_PRODI } from '@/lib/config';
 import { loadViews } from '@/lib/load';
 
 export const dynamic = 'force-dynamic';
@@ -31,12 +31,11 @@ export default async function PenugasanPage() {
   }
   const uniq = (xs: string[]) => [...new Set(xs.filter(Boolean))];
   const prodiOptions = [...DEFAULT_PRODI, ...uniq(views.map((v) => v.prodi)).filter((p) => !DEFAULT_PRODI.includes(p))];
-  const jenisOptions = [...JENIS_PEGAWAI, ...uniq(views.map((v) => v.jenisPegawai)).filter((p) => !JENIS_PEGAWAI.includes(p))];
   const skOptions = uniq(views.map((v) => v.noSk)).sort((a, b) => a.localeCompare(b, 'id', { numeric: true }));
 
   return (
     <Suspense fallback={null}>
-      <AssignmentList views={views} prodiOptions={prodiOptions} jenisOptions={jenisOptions} skOptions={skOptions} />
+      <AssignmentList views={views} prodiOptions={prodiOptions} skOptions={skOptions} />
     </Suspense>
   );
 }
