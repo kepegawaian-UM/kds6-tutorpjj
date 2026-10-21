@@ -116,7 +116,7 @@ export default async function DashboardPage() {
           </div>
           <div className="card overflow-hidden border-yellow-300 dark:border-yellow-800">
             <h3 className="border-b border-border px-4 py-2.5 text-sm font-semibold">
-              Masa tugas belum diketahui <span className="font-normal text-muted">({unknown.length})</span>
+              Perkiraan masa tugas <span className="font-normal text-muted">({unknown.length})</span>
             </h3>
             {expired.length > 0 && (
               <p className="border-b border-border bg-surface-2 px-4 py-2 text-xs text-muted">

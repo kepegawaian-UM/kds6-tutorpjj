@@ -39,7 +39,7 @@ export const STATUS_LABEL = {
   aktif: 'Aktif',
   segera: 'Segera berakhir',
   berakhir: 'Berakhir',
-  belum: 'Masa tugas belum diketahui',
+  belum: 'Perkiraan masa tugas',
 } as const;
 
 /**

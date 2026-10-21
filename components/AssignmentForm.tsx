@@ -129,8 +129,8 @@ export function AssignmentForm({ mode, id, initial, tutors, sks, prodiOptions, r
 
   const est = v.tanggalSelesai ? null : estimateEnd({ tanggalMulai: v.tanggalMulai || null, tanggalSk: v.tanggalSk || null, tanggalSelesai: null });
   const selesaiHint = est
-    ? `Boleh kosong (status: masa tugas belum diketahui). Perkiraan menurut semester: ${formatDate(est)}.`
-    : 'Boleh kosong (status: masa tugas belum diketahui).';
+    ? `Boleh kosong. Akan tampil sebagai perkiraan menurut semester: ${formatDate(est)}.`
+    : 'Boleh kosong. Tanpa tanggal mulai atau SK, perkiraan tidak bisa dihitung.';
   const offSemester = !!v.tanggalSelesai && !isSemesterEnd(v.tanggalSelesai);
 
   const inv = (k: string) => ({ 'aria-invalid': !!errors[k], 'aria-describedby': errors[k] ? `${k}-err` : undefined });

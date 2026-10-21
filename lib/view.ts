@@ -4,7 +4,7 @@ import { assignKeys } from './tutors';
 import type { Assignment, StatusInfo } from './types';
 
 /**
- * Petunjuk perpanjangan untuk penugasan "belum diketahui" yang perkiraannya sudah lewat.
+ * Petunjuk perpanjangan untuk penugasan tanpa tanggal selesai (status perkiraan) yang perkiraannya sudah lewat.
  * - sama: ada SK lebih baru untuk tutor yang sama di prodi yang sama
  * - lain: tidak di prodi ini, tetapi tutor punya SK lebih baru di prodi lain
  * - tidak: tidak ada SK lebih baru sama sekali (perlu verifikasi)

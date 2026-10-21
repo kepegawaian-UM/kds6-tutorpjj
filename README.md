@@ -4,7 +4,7 @@ Aplikasi web untuk memantau penugasan tutor Pendidikan Jarak Jauh (PJJ). Dibangu
 
 ## Fitur
 
-- **Dashboard**: kartu ringkasan, daftar "Perlu perhatian" (segera berakhir dan masa tugas belum diketahui), grafik per prodi dan komposisi jenis pegawai (klik untuk memfilter).
+- **Dashboard**: kartu ringkasan, daftar "Perlu perhatian" (segera berakhir dan perkiraan masa tugas), grafik per prodi dan komposisi jenis pegawai (klik untuk memfilter).
 - **Penugasan**: cari, filter, urutkan, tambah/ubah/hapus, ekspor Excel/CSV mengikuti filter aktif. Tampil sebagai kartu di HP.
 - **Tutor**: daftar tutor unik dan riwayat penugasan per tutor.
 - Data selalu dibaca langsung dari Sheets (tanpa cache), jadi pengeditan manual di Google Sheets langsung terlihat.
@@ -93,7 +93,7 @@ tests/          unit test (vitest)
 | Aktif | Tanggal Selesai > 30 hari dari hari ini |
 | Segera berakhir | Sisa 0 sampai 30 hari (sisa hari ditampilkan) |
 | Berakhir | Tanggal Selesai sudah lewat |
-| Masa tugas belum diketahui | Tanggal Selesai kosong (badge kuning mencolok; tidak dianggap aktif maupun berakhir) |
+| Perkiraan masa tugas | Tanggal Selesai kosong. Badge kuning berisi perkiraan akhir semester, mis. "Perkiraan s.d. 31/12/2026" (tanpa dasar tanggal: "Tanggal selesai belum diisi"). Tidak dianggap aktif maupun berakhir |
 
 Penanda terpisah **"Tanggal mulai kosong"** muncul bila Tanggal Mulai kosong.
 

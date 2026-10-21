@@ -12,6 +12,12 @@ const STYLE: Record<StatusKey, string> = {
   belum: 'bg-yellow-100 text-yellow-900 border-yellow-400 font-semibold dark:bg-yellow-950 dark:text-yellow-200 dark:border-yellow-600',
 };
 
+/** Isi badge untuk penugasan tanpa tanggal selesai: perkiraan akhir semester. */
+function belumLabel(estimatedEnd?: string | null, expired?: boolean): string {
+  if (!estimatedEnd) return 'Tanggal selesai belum diisi';
+  return expired ? `Perkiraan s.d. ${formatDate(estimatedEnd)} · lewat` : `Perkiraan s.d. ${formatDate(estimatedEnd)}`;
+}
+
 export function RenewalHint({ renewal }: { renewal: Renewal | null | undefined }) {
   if (!renewal) return null;
   const prodi = renewal.prodi?.replace(/^S2 PJJs+/i, '');
@@ -44,19 +50,11 @@ export function StatusBadge({
   return (
     <>
       <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium ${STYLE[status]}`}>
-        {status === 'belum' && <IconWarning />}
+        {status === 'belum' && (estimatedEnd && !estimateExpired ? <IconClock /> : <IconWarning />)}
         {status === 'segera' && <IconClock />}
-        {STATUS_LABEL[status]}
+        {status === 'belum' ? belumLabel(estimatedEnd, estimateExpired) : STATUS_LABEL[status]}
         {status === 'segera' && daysLeft !== null && <> · {daysLeft === 0 ? 'hari ini' : `${daysLeft} hari lagi`}</>}
       </span>
-      {status === 'belum' && estimatedEnd && (
-        <span
-          className={`block w-full max-w-[14rem] text-xs ${estimateExpired ? 'text-orange-700' : 'text-muted'}`}
-          title="Perkiraan dari akhir semester; belum tercatat di Google Sheets"
-        >
-          {estimateExpired ? `Perkiraan ${formatDate(estimatedEnd)} sudah lewat` : `Perkiraan s.d. ${formatDate(estimatedEnd)}`}
-        </span>
-      )}
       {status === 'belum' && estimateExpired && <RenewalHint renewal={renewal} />}
     </>
   );

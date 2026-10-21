@@ -9,7 +9,7 @@ export function getStatus(a: DatesOnly, today: string = todayJakarta()): StatusI
   const startMissing = !a.tanggalMulai;
   const none = { estimatedEnd: null, estimateExpired: false };
   if (!a.tanggalSelesai) {
-    // Status tetap "belum diketahui"; perkiraan hanya petunjuk.
+    // Kategori tetap terpisah dari Aktif/Berakhir; perkiraan hanya petunjuk.
     const estimatedEnd = estimateEnd({ tanggalMulai: a.tanggalMulai, tanggalSk: a.tanggalSk ?? null, tanggalSelesai: null });
     return { status: 'belum', daysLeft: null, startMissing, estimatedEnd, estimateExpired: !!estimatedEnd && estimatedEnd < today };
   }
