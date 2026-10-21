@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { IconCalendar, IconDownload, IconHome, IconList, IconLogout, IconMenu, IconPlus, IconSearch, IconUsers } from './Icons';
+import { IconCalendar, IconDownload, IconFile, IconHome, IconList, IconLogout, IconMenu, IconPlus, IconSearch, IconUsers } from './Icons';
 
 type Item = { href: string; label: string; icon: React.ReactNode; match?: (p: string) => boolean; download?: boolean };
 
@@ -13,6 +13,7 @@ const GROUPS: { title: string; items: Item[] }[] = [
     items: [
       { href: '/', label: 'Ringkasan', icon: <IconHome />, match: (p) => p === '/' },
       { href: '/penugasan', label: 'Daftar Penugasan', icon: <IconList />, match: (p) => p.startsWith('/penugasan') && p !== '/penugasan/baru' },
+      { href: '/sk', label: 'Daftar SK', icon: <IconFile />, match: (p) => p.startsWith('/sk') },
       { href: '/tutor', label: 'Daftar Tutor', icon: <IconUsers />, match: (p) => p.startsWith('/tutor') },
     ],
   },

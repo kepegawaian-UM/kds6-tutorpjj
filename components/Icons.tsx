@@ -46,3 +46,6 @@ export const IconSearch = ({ className }: P) => (
 export const IconCalendar = ({ className }: P) => (
   <svg {...base} className={className}><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
 );
+export const IconFile = ({ className }: P) => (
+  <svg {...base} className={className}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h8" /></svg>
+);
