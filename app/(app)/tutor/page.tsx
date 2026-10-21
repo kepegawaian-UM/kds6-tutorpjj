@@ -1,14 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { EmptyState, ErrorState, PageHeader } from '@/components/States';
+import { asalWilayah } from '@/lib/asal';
 import { loadViews } from '@/lib/load';
 import { groupTutors, nameKey } from '@/lib/tutors';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Daftar tutor' };
 
-export default async function TutorListPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const { q = '' } = await searchParams;
+export default async function TutorListPage({ searchParams }: { searchParams: Promise<{ q?: string; asal?: string }> }) {
+  const { q = '', asal = '' } = await searchParams;
   const res = await loadViews();
   if (!res.ok) {
     return (
@@ -20,17 +21,26 @@ export default async function TutorListPage({ searchParams }: { searchParams: Pr
   }
   const all = groupTutors(res.views);
   const needle = nameKey(q);
-  const tutors = needle
+  const byQuery = needle
     ? all.filter((t) => `${nameKey(t.nama)} ${t.nip} ${t.unitKerja.toLowerCase()}`.includes(needle) || `${t.nama} ${t.unitKerja}`.toLowerCase().includes(q.toLowerCase()))
     : all;
+  const tutors = asal ? byQuery.filter((t) => asalWilayah(t) === asal) : byQuery;
 
   return (
     <>
       <PageHeader title="Daftar tutor" subtitle={`${all.length} tutor unik dari ${res.views.length} penugasan`} />
       <form className="mb-4 flex gap-2" role="search">
+        {asal && <input type="hidden" name="asal" value={asal} />}
         <input name="q" defaultValue={q} className="field" placeholder="Cari nama, NIP, atau unit kerja…" aria-label="Cari tutor" />
         <button className="btn">Cari</button>
       </form>
+
+      {asal && (
+        <p className="mb-3 flex flex-wrap items-center gap-2 text-sm">
+          Asal: <span className="rounded-full bg-accent-soft px-2.5 py-0.5 font-medium">{asal}</span>
+          <Link href={q ? `/tutor?q=${encodeURIComponent(q)}` : '/tutor'} className="text-muted underline hover:text-accent">Hapus filter</Link>
+        </p>
+      )}
 
       {tutors.length === 0 ? (
         <EmptyState title="Tutor tidak ditemukan">Coba kata kunci lain.</EmptyState>

@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import { AsalSection } from '@/components/AsalSection';
 import { DashboardCharts, type Slice } from '@/components/DashboardCharts';
 import { StartMissingBadge, StatusBadge } from '@/components/StatusBadge';
 import { EmptyState, ErrorState, PageHeader } from '@/components/States';
+import { asalBreakdown } from '@/lib/asal';
 import { DEFAULT_PRODI, JENIS_PEGAWAI, STATUS_LABEL } from '@/lib/config';
 import { formatDate } from '@/lib/dates';
 import { loadViews } from '@/lib/load';
@@ -128,6 +130,10 @@ export default async function DashboardPage() {
           prodi={countBy(views, (v) => v.prodi, DEFAULT_PRODI)}
           jenis={countBy(views, (v) => v.jenisPegawai, JENIS_PEGAWAI)}
         />
+      </section>
+
+      <section className="mt-4" aria-label="Asal tutor">
+        <AsalSection data={asalBreakdown(groupTutors(views))} />
       </section>
     </>
   );
