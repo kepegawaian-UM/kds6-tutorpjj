@@ -28,7 +28,7 @@ export default async function EditAssignmentPage({ params }: { params: Promise<{
     <>
       <PageHeader title="Ubah penugasan" subtitle={`${row.nama} · ${row.prodi}`} />
       <div className="-mt-3 mb-5 flex flex-wrap gap-1.5">
-        <StatusBadge status={row.status} daysLeft={row.daysLeft} />
+        <StatusBadge status={row.status} daysLeft={row.daysLeft} estimatedEnd={row.estimatedEnd} estimateExpired={row.estimateExpired} />
         {row.startMissing && <StartMissingBadge />}
       </div>
       <AssignmentForm

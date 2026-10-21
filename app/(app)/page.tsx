@@ -40,7 +40,7 @@ function AttentionItem({ r }: { r: AssignmentView }) {
           </p>
         </div>
         <div className="flex items-center gap-1.5">
-          <StatusBadge status={r.status} daysLeft={r.daysLeft} />
+          <StatusBadge status={r.status} daysLeft={r.daysLeft} estimatedEnd={r.estimatedEnd} estimateExpired={r.estimateExpired} />
           {r.startMissing && <StartMissingBadge />}
         </div>
       </Link>

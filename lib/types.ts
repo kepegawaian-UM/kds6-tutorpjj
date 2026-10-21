@@ -29,6 +29,10 @@ export interface StatusInfo {
   daysLeft: number | null;
   /** Penanda kualitas data terpisah. */
   startMissing: boolean;
+  /** Perkiraan akhir (akhir semester) hanya bila Tanggal Selesai kosong; tidak ditulis ke Sheets. */
+  estimatedEnd: string | null;
+  /** Perkiraan sudah lewat dari hari ini (perlu verifikasi). */
+  estimateExpired: boolean;
 }
 
 export interface Tutor {

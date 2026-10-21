@@ -31,7 +31,7 @@ function Period({ r }: { r: AssignmentView }) {
 function Badges({ r }: { r: AssignmentView }) {
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      <StatusBadge status={r.status} daysLeft={r.daysLeft} />
+      <StatusBadge status={r.status} daysLeft={r.daysLeft} estimatedEnd={r.estimatedEnd} estimateExpired={r.estimateExpired} />
       {r.startMissing && <StartMissingBadge />}
     </div>
   );

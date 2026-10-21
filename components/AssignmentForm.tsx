@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { JENIS_PEGAWAI } from '@/lib/config';
+import { formatDate } from '@/lib/dates';
+import { estimateEnd, isSemesterEnd } from '@/lib/semester';
 import { findSimilarNames, nameKey } from '@/lib/tutors';
 import type { Tutor } from '@/lib/types';
 import { assignmentSchema, composeJudulSk, fieldErrors, type AssignmentFormValues } from '@/lib/validation';
@@ -124,6 +126,12 @@ export function AssignmentForm({ mode, id, initial, tutors, sks, prodiOptions, r
       setSaving(false);
     }
   }
+
+  const est = v.tanggalSelesai ? null : estimateEnd({ tanggalMulai: v.tanggalMulai || null, tanggalSk: v.tanggalSk || null, tanggalSelesai: null });
+  const selesaiHint = est
+    ? `Boleh kosong (status: masa tugas belum diketahui). Perkiraan menurut semester: ${formatDate(est)}.`
+    : 'Boleh kosong (status: masa tugas belum diketahui).';
+  const offSemester = !!v.tanggalSelesai && !isSemesterEnd(v.tanggalSelesai);
 
   const inv = (k: string) => ({ 'aria-invalid': !!errors[k], 'aria-describedby': errors[k] ? `${k}-err` : undefined });
   const prodiSelectValue = newProdi ? NEW_PRODI : v.prodi;
@@ -254,10 +262,15 @@ export function AssignmentForm({ mode, id, initial, tutors, sks, prodiOptions, r
           <Field label="Tanggal mulai" htmlFor="tanggalMulai" error={errors.tanggalMulai} hint="Boleh kosong.">
             <input id="tanggalMulai" type="date" className="field" value={v.tanggalMulai} onChange={(e) => set('tanggalMulai', e.target.value)} {...inv('tanggalMulai')} />
           </Field>
-          <Field label="Tanggal selesai" htmlFor="tanggalSelesai" error={errors.tanggalSelesai} hint="Boleh kosong (status: masa tugas belum diketahui).">
+          <Field label="Tanggal selesai" htmlFor="tanggalSelesai" error={errors.tanggalSelesai} hint={selesaiHint}>
             <input id="tanggalSelesai" type="date" className="field" min={v.tanggalMulai || undefined} value={v.tanggalSelesai} onChange={(e) => set('tanggalSelesai', e.target.value)} {...inv('tanggalSelesai')} />
           </Field>
         </div>
+        {offSemester && (
+          <p role="status" className="rounded-lg border border-yellow-300 bg-yellow-50 p-3 text-xs text-yellow-900 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-200">
+            Tanggal selesai tidak jatuh di akhir semester (30 Juni atau 31 Desember). Tetap bisa disimpan bila memang benar.
+          </p>
+        )}
       </section>
 
       {globalError && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{globalError}</p>}

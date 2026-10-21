@@ -1,5 +1,6 @@
 import { STATUS_LABEL } from '@/lib/config';
 import type { StatusKey } from '@/lib/types';
+import { formatDate } from '@/lib/dates';
 import { IconClock, IconWarning } from './Icons';
 
 const STYLE: Record<StatusKey, string> = {
@@ -10,14 +11,34 @@ const STYLE: Record<StatusKey, string> = {
   belum: 'bg-yellow-100 text-yellow-900 border-yellow-400 font-semibold dark:bg-yellow-950 dark:text-yellow-200 dark:border-yellow-600',
 };
 
-export function StatusBadge({ status, daysLeft }: { status: StatusKey; daysLeft: number | null }) {
+export function StatusBadge({
+  status,
+  daysLeft,
+  estimatedEnd,
+  estimateExpired,
+}: {
+  status: StatusKey;
+  daysLeft: number | null;
+  estimatedEnd?: string | null;
+  estimateExpired?: boolean;
+}) {
   return (
+    <>
     <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium ${STYLE[status]}`}>
       {status === 'belum' && <IconWarning />}
       {status === 'segera' && <IconClock />}
       {STATUS_LABEL[status]}
       {status === 'segera' && daysLeft !== null && <> · {daysLeft === 0 ? 'hari ini' : `${daysLeft} hari lagi`}</>}
     </span>
+    {status === 'belum' && estimatedEnd && (
+      <span
+        className={`block w-full max-w-[13rem] text-xs ${estimateExpired ? 'font-medium text-orange-700 dark:text-orange-400' : 'text-muted'}`}
+        title="Perkiraan dari akhir semester; belum tercatat di Google Sheets"
+      >
+        {estimateExpired ? `Perkiraan ${formatDate(estimatedEnd)} sudah lewat, verifikasi` : `Perkiraan s.d. ${formatDate(estimatedEnd)}`}
+      </span>
+    )}
+    </>
   );
 }
 

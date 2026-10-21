@@ -41,3 +41,12 @@ export const STATUS_LABEL = {
   berakhir: 'Berakhir',
   belum: 'Masa tugas belum diketahui',
 } as const;
+
+/**
+ * Akhir semester (bulan, hari) yang dipakai untuk memperkirakan akhir masa tugas bila Tanggal Selesai kosong.
+ * Saat ini semester kalender: 30 Juni dan 31 Desember. Ubah di sini bila memakai kalender akademik lain.
+ */
+export const SEMESTER_ENDS: [month: number, day: number][] = [
+  [6, 30],
+  [12, 31],
+];

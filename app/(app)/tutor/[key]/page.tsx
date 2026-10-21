@@ -73,7 +73,7 @@ export default async function TutorDetailPage({ params }: { params: Promise<{ ke
                   <p className="text-sm text-muted">{r.jabatanTugas || 'Jabatan tugas belum diisi'}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <StatusBadge status={v.status} daysLeft={v.daysLeft} />
+                  <StatusBadge status={v.status} daysLeft={v.daysLeft} estimatedEnd={v.estimatedEnd} estimateExpired={v.estimateExpired} />
                   {v.startMissing && <StartMissingBadge />}
                 </div>
               </div>

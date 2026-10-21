@@ -97,6 +97,8 @@ tests/          unit test (vitest)
 
 Penanda terpisah **"Tanggal mulai kosong"** muncul bila Tanggal Mulai kosong.
 
+**Perkiraan akhir semester**: bila Tanggal Selesai kosong, aplikasi menampilkan petunjuk "Perkiraan s.d. …" yaitu akhir semester pertama (30 Juni atau 31 Desember, `SEMESTER_ENDS` di [lib/config.ts](lib/config.ts)) yang jatuh pada atau setelah Tanggal Mulai (atau Tanggal SK bila mulai kosong). Status tetap "Masa tugas belum diketahui", perkiraan tidak ditulis ke Google Sheets, dan perkiraan yang sudah lewat hanya diberi tanda "verifikasi", tidak otomatis menjadi "Berakhir". Di form, tanggal selesai yang tidak jatuh di akhir semester mendapat peringatan lunak (tetap bisa disimpan).
+
 **Tutor unik**: kunci utama NIP. Tanpa NIP, kunci dari nama yang dinormalkan (huruf kecil, tanda baca diabaikan, `M.Pd` = `M.Pd.`). Baris tanpa NIP yang namanya sama dengan baris ber-NIP digabung ke NIP tersebut. Nama tampilan: versi terpanjang. Pangkat/Gol: nilai non-kosong dan bukan `-` yang paling baru.
 
 **Identitas baris**: kolom O (`ID`, UUID). Ubah dan hapus selalu mencari baris berdasarkan ID, jadi aman bila Anda menyortir atau menyisipkan baris di Sheets. Baris tanpa ID (diketik manual) diberi ID otomatis saat data dibaca; baris yang ID-nya ganda (hasil salin-tempel) juga diberi ID baru. Jangan hapus kolom O.
